@@ -60,7 +60,7 @@ void LD(Cpu* cpu, u_int8_t x, u_int8_t nn)
 
 void ADD(Cpu* cpu, u_int8_t x, u_int8_t nn)
 {
-    cpu->V[x] = cpu->V[x] + nn;
+    cpu->V[x] += nn;
 }
 
 void LD_REG(Cpu* cpu, u_int8_t x, u_int8_t y)
@@ -110,7 +110,7 @@ void SHR(Cpu* cpu, u_int8_t x)
     if ((cpu->V[x] & (0xFFFF >> 15)) == 1) 
     {
         cpu->V[0xF] = 1;
-        cpu->V[x] *= 2;
+        cpu->V[x] /= 2;
     }
 }
 
@@ -119,7 +119,7 @@ void SUBN(Cpu* cpu, u_int8_t x, u_int8_t y)
     cpu->V[0xF] = 0;
     if (cpu->V[x] < cpu->V[y])
     {
-        cpu->V[y] -= cpu->V[x];
+        cpu->V[x] =  cpu->V[y] - cpu->V[x];
         cpu->V[0xF] = 1;
     }
 }
