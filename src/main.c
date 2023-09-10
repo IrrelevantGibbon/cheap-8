@@ -92,7 +92,7 @@
             SDL_RenderCopy(display->renderer, display->screen, NULL, NULL);
             SDL_RenderPresent(display->renderer);
         }
-        SDL_Delay(1000/60);
+        SDL_Delay(1000/200);
     }
 
     closeDisplay(display);

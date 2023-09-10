@@ -33,7 +33,7 @@ void SE(Cpu* cpu, u_int8_t x, u_int8_t nn)
 {
     if (cpu->V[x] == nn) 
     {
-        cpu->SP += 2;
+        cpu->PC += 2;
     }
 }
 
@@ -41,7 +41,7 @@ void SNE(Cpu* cpu, u_int8_t x, u_int8_t nn)
 {
     if (cpu->V[x] != nn) 
     {
-        cpu->SP += 2;
+        cpu->PC += 2;
     }
 }
 
@@ -49,7 +49,7 @@ void SE_REG(Cpu* cpu, u_int8_t x, u_int8_t y)
 {
     if (cpu->V[x] == cpu->V[y])
     {
-        cpu->SP += 2;
+        cpu->PC += 2;
     }
 }
 
