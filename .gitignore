@@ -16,6 +16,7 @@ _deps
 Cheap_8
 build
 .vscode
+.DS_Store
 
 ### CMake Patch ###
 # External projects
