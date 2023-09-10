@@ -76,6 +76,7 @@ void execute(Cpu* cpu, DecodedOpcode* decodedOpcode, u_int16_t opcode)
                     CLS(cpu);
                     break;
                 case 0x000E:
+                    RET(cpu);
                     break;
                 default:
                     break;
@@ -85,18 +86,118 @@ void execute(Cpu* cpu, DecodedOpcode* decodedOpcode, u_int16_t opcode)
             JP(cpu, decodedOpcode->nnn);
             break;
         case 0X2000:
+            CALL(cpu, decodedOpcode->nnn);
             break;
-        case 0x6000:
+        case 0X3000:
+            SE(cpu, decodedOpcode->x, decodedOpcode->nn);
+            break;
+        case 0X4000:
+            SNE(cpu, decodedOpcode->x, decodedOpcode->nn);
+            break;
+        case 0X5000:
+            SE_REG(cpu, decodedOpcode->x, decodedOpcode->y);
+            break;
+        case 0X6000:
             LD(cpu, decodedOpcode->x, decodedOpcode->nn);
             break;
         case 0x7000:
             ADD(cpu, decodedOpcode->x, decodedOpcode->nn);
             break;
+        case 0x8000:
+            switch (opcode & 0x000F)
+            {
+                case 0x0000:
+                    LD_REG(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0001:
+                    OR(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0002:
+                    AND(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0003:
+                    XOR(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0004:
+                    ADD_REG(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0005:
+                    SUB(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x0006:
+                    SHR(cpu, decodedOpcode->x);
+                    break;
+                case 0x0007:
+                    SUBN(cpu, decodedOpcode->x, decodedOpcode->y);
+                    break;
+                case 0x000E:
+                    SHL(cpu, decodedOpcode->x);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 0x9000:
+            SNE_REG(cpu, decodedOpcode->x, decodedOpcode->y);
+            break;
         case 0xA000:
             LD_I(cpu, decodedOpcode->nnn);
             break;
+        case 0xB000:
+            JP_V0(cpu, decodedOpcode->nnn);
+            break;
+        case 0xC000:
+            RND(cpu, decodedOpcode->x, decodedOpcode->nn);
+            break;
         case 0xD000:
             DRW(cpu, decodedOpcode->x, decodedOpcode->y, decodedOpcode->n);
+            break;
+        case 0xE000:
+            switch (opcode & 0x00FF)
+            {
+                case 0x009E:
+                    SKP(cpu, decodedOpcode->x);
+                    break;
+                case 0x00A1:
+                    SKNP(cpu, decodedOpcode->x);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case 0xF000:
+            switch (opcode & 0x00FF)
+            {
+                case 0x0007:
+                    LD_REG_DT(cpu, decodedOpcode->x);
+                    break;
+                case 0x000A:
+                    LD_KEY(cpu, decodedOpcode->x);
+                    break;
+                case 0x0015:
+                    LD_DT(cpu, decodedOpcode->x);
+                    break;
+                case 0x0018:
+                    LD_ST(cpu, decodedOpcode->x);
+                    break;
+                case 0x001E:
+                    ADD_I(cpu, decodedOpcode->x);
+                    break;
+                case 0x0029:
+                    LD_F(cpu, decodedOpcode->x);
+                    break;
+                case 0x0033:
+                    LD_B(cpu, decodedOpcode->x);
+                    break;
+                case 0x0055:
+                    LD_MEM(cpu, decodedOpcode->x);
+                    break;
+                case 0x0065:
+                    LD_REG_MEM(cpu, decodedOpcode->x);
+                    break;
+                default:
+                    break;
+            }
             break;
         default:
             break;

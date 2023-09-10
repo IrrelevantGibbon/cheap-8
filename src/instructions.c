@@ -7,6 +7,7 @@ void CLS(Cpu* cpu)
     for (int i = 0; i < 64 * 32; i++)
     {
         cpu->SCREEN[i] = 0;
+        cpu->shouldDraw = 1;
     }
 }
 
@@ -103,7 +104,7 @@ void SUB(Cpu* cpu, u_int8_t x, u_int8_t y)
     }
 }
 
-void SHR(Cpu* cpu, u_int8_t x, u_int8_t y)
+void SHR(Cpu* cpu, u_int8_t x)
 {
     cpu->V[0xF] = 0;
     if ((cpu->V[x] & (0xFFFF >> 15)) == 1) 
@@ -123,7 +124,7 @@ void SUBN(Cpu* cpu, u_int8_t x, u_int8_t y)
     }
 }
 
-void SHL(Cpu* cpu, u_int8_t x, u_int8_t y)
+void SHL(Cpu* cpu, u_int8_t x)
 {
     cpu->V[0xF] = 0;
     if (((cpu->V[x] & (0xFFFF << 15)) >> 15) == 1) 
