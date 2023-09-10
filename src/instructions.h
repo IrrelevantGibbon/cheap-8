@@ -1,0 +1,38 @@
+#pragma once
+#include "cpu.h"
+
+void SYS(Cpu* cpu, u_int16_t nnn);
+void CLS(Cpu* cpu);
+void RET(Cpu* cpu);
+void JP(Cpu* cpu, u_int16_t nnn);
+void CALL(Cpu* cpu, u_int16_t nnn);
+void SE(Cpu* cpu, u_int8_t x, u_int8_t nn);
+void SNE(Cpu* cpu, u_int8_t x, u_int8_t nn);
+void SE_REG(Cpu* cpu, u_int8_t x, u_int8_t y);
+void LD(Cpu* cpu, u_int8_t x, u_int8_t nn);
+void ADD(Cpu* cpu, u_int8_t x, u_int8_t nn);
+void LD_REG(Cpu* cpu, u_int8_t x, u_int8_t y);
+void OR(Cpu* cpu, u_int8_t x, u_int8_t y);
+void AND(Cpu* cpu, u_int8_t x, u_int8_t y);
+void XOR(Cpu* cpu, u_int8_t x, u_int8_t y);
+void ADD_REG(Cpu* cpu, u_int8_t x, u_int8_t y);
+void SUB(Cpu* cpu, u_int8_t x, u_int8_t y);
+void SHR(Cpu* cpu, u_int8_t x, u_int8_t y);
+void SUBN(Cpu* cpu, u_int8_t x, u_int8_t y);
+void SHL(Cpu* cpu, u_int8_t x, u_int8_t y);
+void SNE_REG(Cpu* cpu, u_int8_t x, u_int8_t y);
+void LD_I(Cpu* cpu, u_int16_t nnn);
+void JP_V0(Cpu* cpu, u_int16_t nnn);
+void RND(Cpu* cpu, u_int8_t x, u_int8_t nn);
+void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n);
+void SKP(Cpu* cpu, u_int8_t x);
+void SKNP(Cpu* cpu, u_int8_t x);
+void LD_REG_DT(Cpu* cpu, u_int8_t x);
+void LD_KEY(Cpu* cpu, u_int8_t x);
+void LD_DT(Cpu* cpu, u_int8_t x);
+void LD_ST(Cpu* cpu, u_int8_t x);
+void ADD_I(Cpu* cpu, u_int8_t x);
+void LD_F(Cpu* cpu, u_int8_t x);
+void LD_B(Cpu* cpu, u_int8_t x);
+void LD_MEM(Cpu* cpu, u_int8_t x);
+void LD_REG_MEM(Cpu* cpu, u_int8_t x);

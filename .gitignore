@@ -1,0 +1,48 @@
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,cmake,librarian-chef
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,cmake,librarian-chef
+
+### CMake ###
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+Cheap_8
+build
+.vscode
+
+### CMake Patch ###
+# External projects
+*-prefix/
+
+### librarian-chef ###
+# librarian-chef - https://github.com/applicationsonline/librarian-chef
+.tmp/
+cookbooks/
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,cmake,librarian-chef
