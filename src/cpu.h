@@ -12,12 +12,13 @@ typedef struct
     u_int8_t M[4096]; // Memory
     u_int8_t V[16]; // Registers
     u_int16_t I; // Index register
-    u_int8_t DT; // Delay timer
+    u_int8_t DT; // Delay timer 
     u_int8_t ST; // Sound timer
     u_int16_t PC; // Program counter
     u_int8_t SP; // Stack pointer
     u_int16_t S[16]; // Stack
     uint8_t SCREEN[2048]; // Screen
+    u_int8_t keys[16];
     u_int8_t shouldDraw;
 } Cpu;
 

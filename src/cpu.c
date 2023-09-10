@@ -37,6 +37,7 @@ Cpu* initCpu()
     memset(cpu->SCREEN, 0, sizeof(cpu->SCREEN));
     memccpy(cpu->M, FONT, 0, sizeof(FONT));
     cpu->shouldDraw = 0;
+    memset(cpu->keys, 0, sizeof(cpu->keys));
     return cpu;
 }
 
