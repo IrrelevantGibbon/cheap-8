@@ -18,14 +18,14 @@ void JP(Cpu* cpu, u_int16_t nnn)
 
 void RET(Cpu* cpu)
 {
-    cpu->PC = cpu->S[cpu->SP];
     cpu->SP--;
+    cpu->PC = cpu->S[cpu->SP];
 }
 
 void CALL(Cpu* cpu, u_int16_t nnn)
 {
-    cpu->SP++;
     cpu->S[cpu->SP] = cpu->PC;
+    cpu->SP++;
     cpu->PC = nnn;
 }
 
@@ -85,11 +85,10 @@ void XOR(Cpu* cpu, u_int8_t x, u_int8_t y)
 
 void ADD_REG(Cpu* cpu, u_int8_t x, u_int8_t y)
 {
-    u_int16_t vxy = cpu->V[x] + cpu->V[y];
+    cpu->V[x] += cpu->V[y];
     cpu->V[0xF] = 0;
-    if (vxy > 255)
+    if (cpu->V[y] > 0xFF - cpu->V[x])
     {
-        cpu->V[x] = (vxy & (0xFFFF) >> 8);
         cpu->V[0xF] = 1;
     }
 }
@@ -99,19 +98,19 @@ void SUB(Cpu* cpu, u_int8_t x, u_int8_t y)
     cpu->V[0xF] = 0;
     if (cpu->V[x] > cpu->V[y])
     {
-        cpu->V[x] -= cpu->V[y];
         cpu->V[0xF] = 1;
     }
+    cpu->V[x] -= cpu->V[y];
 }
 
 void SHR(Cpu* cpu, u_int8_t x)
 {
     cpu->V[0xF] = 0;
-    if ((cpu->V[x] & (0xFFFF >> 15)) == 1) 
+    if ((cpu->V[x] & 0x01) == 1) 
     {
         cpu->V[0xF] = 1;
-        cpu->V[x] /= 2;
     }
+    cpu->V[x] /= 2;
 }
 
 void SUBN(Cpu* cpu, u_int8_t x, u_int8_t y)
@@ -119,19 +118,19 @@ void SUBN(Cpu* cpu, u_int8_t x, u_int8_t y)
     cpu->V[0xF] = 0;
     if (cpu->V[x] < cpu->V[y])
     {
-        cpu->V[x] =  cpu->V[y] - cpu->V[x];
         cpu->V[0xF] = 1;
     }
+    cpu->V[x] =  cpu->V[y] - cpu->V[x];
 }
 
 void SHL(Cpu* cpu, u_int8_t x)
 {
     cpu->V[0xF] = 0;
-    if (((cpu->V[x] & (0xFFFF << 15)) >> 15) == 1) 
+    if ( ((cpu->V[x] >> 7) & 0x01) == 1) 
     {
         cpu->V[0xF] = 1;
-        cpu->V[x] *= 2;
     }
+    cpu->V[x] *= 2;
 }
 
 void SNE_REG(Cpu* cpu, u_int8_t x, u_int8_t y)
@@ -230,6 +229,11 @@ void LD_ST(Cpu* cpu, u_int8_t x)
 
 void ADD_I(Cpu* cpu, u_int8_t x)
 {
+    cpu->V[0xF] = 0;
+    if(cpu->I + cpu->V[x] > 0xFFF)
+    {
+        cpu->V[0xF] = 1;
+    }
     cpu->I += cpu->V[x];
 }
 
@@ -242,7 +246,7 @@ void LD_B(Cpu* cpu, u_int8_t x)
 {
     u_int16_t vx = cpu->V[x];
     cpu->M[cpu->I] = vx / 100;
-    cpu->M[cpu->I + 1] = vx % 100;
+    cpu->M[cpu->I + 1] = vx / 10 % 100;
     cpu->M[cpu->I + 2] = vx % 10;
 }
 

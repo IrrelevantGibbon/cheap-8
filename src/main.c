@@ -2,10 +2,11 @@
 #include "cpu.h"
 #include "display.h"
 #include "rom.h"
+#include <time.h>
 
  int main(int argc, char *argv[])
 {
- 
+    srand( time( NULL ) );
     Display *display = initDisplay();
     Cpu *cpu = initCpu();
 
@@ -17,6 +18,8 @@
     loadRom(argv[1], cpu->M);
 
     printf("FILE, LOADED IN RAM");
+
+    int pause = 0;
 
     while (1) {
         SDL_Event event;
@@ -64,35 +67,28 @@
                 if (event.key.keysym.sym == SDLK_DOWN) cpu->keys[0xD] = 0;
                 if (event.key.keysym.sym == SDLK_f) cpu->keys[0xE] = 0;
                 if (event.key.keysym.sym == SDLK_v) cpu->keys[0xF] = 0;
+                if (event.key.keysym.sym == SDLK_SPACE) pause = !pause;
             }
         }
-
-        u_int16_t opcode = fetch(cpu);
-        DecodedOpcode* decodedOpcode = decode(cpu, opcode);
-        printf("--------------------------------------------------\n");
-        printf("OPCODE: %x\n", opcode);
-        printf("PC: %x\n", cpu->PC);
-        printf("I: %x\n", cpu->I);
-        printf("N: %x\n", decodedOpcode->n);
-        printf("NN: %x\n", decodedOpcode->nn);
-        printf("NNN: %x\n", decodedOpcode->nnn);
-        printf("X: %x\n", decodedOpcode->x);
-        printf("Y: %x\n", decodedOpcode->y);
-        printf("--------------------------------------------------\n");
-        execute(cpu, decodedOpcode, opcode);
-        freeDecodedOpcode(decodedOpcode);
-        if (cpu->shouldDraw == 1)
+        if (pause == 0) 
         {
-            cpu->shouldDraw = 0;
-            SDL_SetRenderTarget(display->renderer, display->screen);
-            draw(display, cpu);
-            SDL_SetRenderTarget(display->renderer, NULL);
-            SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255); // Clear the screen with black
-            SDL_RenderClear(display->renderer);
-            SDL_RenderCopy(display->renderer, display->screen, NULL, NULL);
-            SDL_RenderPresent(display->renderer);
+            u_int16_t opcode = fetch(cpu);
+            DecodedOpcode* decodedOpcode = decode(cpu, opcode);
+            execute(cpu, decodedOpcode, opcode);
+            freeDecodedOpcode(decodedOpcode);
+            if (cpu->shouldDraw == 1)
+            {
+                cpu->shouldDraw = 0;
+                SDL_SetRenderTarget(display->renderer, display->screen);
+                draw(display, cpu);
+                SDL_SetRenderTarget(display->renderer, NULL);
+                SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255); // Clear the screen with black
+                SDL_RenderClear(display->renderer);
+                SDL_RenderCopy(display->renderer, display->screen, NULL, NULL);
+                SDL_RenderPresent(display->renderer);
+            }
         }
-        SDL_Delay(1000/300);
+        SDL_Delay(1000/500);
     }
 
     closeDisplay(display);
