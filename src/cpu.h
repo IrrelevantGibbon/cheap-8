@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <sys/types.h>
 
 #define dec_x(op) ((opcode & 0x0F00) >> 8)
 #define dec_y(op) ((opcode & 0x00F0) >> 4)

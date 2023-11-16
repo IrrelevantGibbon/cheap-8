@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <sys/types.h>
 void CLS(Cpu* cpu)
 {
     for (int i = 0; i < 64 * 32; i++)
@@ -246,13 +246,13 @@ void LD_B(Cpu* cpu, u_int8_t x)
 {
     u_int16_t vx = cpu->V[x];
     cpu->M[cpu->I] = vx / 100;
-    cpu->M[cpu->I + 1] = vx / 10 % 100;
+    cpu->M[cpu->I + 1] = (vx / 10) % 10;
     cpu->M[cpu->I + 2] = vx % 10;
 }
 
 void LD_MEM(Cpu* cpu, u_int8_t x)
 {
-    for (u_int8_t i = 0; i < x; i++) 
+    for (u_int8_t i = 0; i <= x; i++)
     {
         cpu->M[cpu->I + i] = cpu->V[i];
     }
@@ -260,7 +260,7 @@ void LD_MEM(Cpu* cpu, u_int8_t x)
 
 void LD_REG_MEM(Cpu* cpu, u_int8_t x)
 {
-    for (u_int8_t i = 0; i < x; i++)
+    for (u_int8_t i = 0; i <= x; i++)
     {
         cpu->V[i] = cpu->M[cpu->I + i];
     }

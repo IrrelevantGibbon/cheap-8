@@ -1,6 +1,6 @@
 #pragma once
 #include "cpu.h"
-
+#include <sys/types.h>
 void CLS(Cpu* cpu);
 void RET(Cpu* cpu);
 void JP(Cpu* cpu, u_int16_t nnn);

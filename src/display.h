@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include "cpu.h"
+#include <sys/types.h>
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 320
