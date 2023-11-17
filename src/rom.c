@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-u_int8_t loadRom(char *file_name, u_int8_t *memory)
+u_int8_t loadRom(const char *file_name, u_int8_t *memory)
 {
     FILE *file = fopen(file_name, "rb");
     if (!file) {
