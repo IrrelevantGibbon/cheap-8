@@ -20,7 +20,18 @@ void loop(Cpu* cpu, Display* display)
     while(1)
     {
         if (cpu->shouldExit == 1 || event_management(cpu) == 1) break;
+        if (cpu->shouldExtend == 2)
+        {
+            setTexturesDimension(display, 128, 64);
+            cpu->shouldExtend = 0;
+        }
+        if (cpu->shouldExtend == 1)
+        {
+            setTexturesDimension(display, 64, 32);
+            cpu->shouldExtend = 0;
+        }
         emulate_cycle(cpu);
+        if (display->shouldReRender == 1) createOrSwapTexture(display);
         if (cpu->shouldDraw == 1) draw_screen(cpu, display);
         SDL_Delay(1000/500);
     }

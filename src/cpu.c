@@ -46,6 +46,7 @@ Cpu* initCpu()
     {
         writeRplFlags(cpu->rpl_flag);
     }
+    cpu->shouldExtend = 1;
     return cpu;
 }
 

@@ -16,17 +16,32 @@ Display* initDisplay()
     Display *display = (Display *)malloc(sizeof(Display));
     display->window = win;
     display->renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-    display->screen = createTexture(display->renderer, 64, 32);
-
-    SDL_SetRenderTarget(display->renderer, display->screen);
+    display->width = 64;
+    display->height = 32;
+    display->shouldReRender = 0;
+    createOrSwapTexture(display);
 
     return display;
 }
 
-SDL_Texture* createTexture(SDL_Renderer* renderer, u_int8_t width, u_int32_t height)
+void createOrSwapTexture(Display* display)
 {
-    return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_TARGET, width, height);
+    SDL_Texture* texture = SDL_CreateTexture(display->renderer,
+                                             SDL_PIXELFORMAT_ARGB8888,
+                                             SDL_TEXTUREACCESS_TARGET,
+                                             display->width, display->height);
+    if (display->screen != NULL) free(display->screen);
+    display->screen = texture;
+    SDL_SetRenderTarget(display->renderer, display->screen);
 }
+
+void setTexturesDimension(Display* display, u_int32_t width, u_int32_t height)
+{
+    display->width = width;
+    display->height = height;
+    display->shouldReRender = 1;
+}
+
 
 void draw(Display* display, Cpu* cpu)
 {

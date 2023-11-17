@@ -23,6 +23,7 @@ typedef struct
     u_int8_t keys[16];
     u_int8_t shouldDraw;
     u_int8_t shouldExit;
+    u_int8_t shouldExtend;
     u_int8_t rpl_flag[8];
 } Cpu;
 

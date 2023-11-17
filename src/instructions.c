@@ -299,3 +299,13 @@ void LD_RPL(Cpu* cpu, u_int8_t x)
         }
     }
 }
+
+void DESM(Cpu* cpu)
+{
+    cpu->shouldExtend = 1;
+}
+
+void EESM(Cpu* cpu)
+{
+    cpu->shouldExtend = 2;
+}
