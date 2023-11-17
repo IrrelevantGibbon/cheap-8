@@ -265,3 +265,37 @@ void LD_REG_MEM(Cpu* cpu, u_int8_t x)
         cpu->V[i] = cpu->M[cpu->I + i];
     }
 }
+
+// SuperChip
+
+void EXIT(Cpu* cpu)
+{
+    cpu->shouldExit = 1;
+}
+
+void LD_FE(Cpu* cpu, u_int8_t x)
+{
+    cpu->I = cpu->V[x] * 0xA;
+}
+
+void STR_RPL(Cpu* cpu, u_int8_t x)
+{
+    if (x < 8)
+    {
+        for (u_int8_t i = 0; i < x; x++)
+        {
+            cpu->rpl_flag[x] = cpu->V[x];
+        }
+    }
+}
+
+void LD_RPL(Cpu* cpu, u_int8_t x)
+{
+    if (x < 8)
+    {
+        for (u_int8_t i = 0; i < x; x++)
+        {
+            cpu->V[x] = cpu->rpl_flag[x];
+        }
+    }
+}

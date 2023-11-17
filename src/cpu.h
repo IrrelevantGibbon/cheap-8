@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <sys/types.h>
+#include <stdio.h>
 
 #define dec_x(op) ((opcode & 0x0F00) >> 8)
 #define dec_y(op) ((opcode & 0x00F0) >> 4)
@@ -21,6 +22,8 @@ typedef struct
     uint8_t SCREEN[2048]; // Screen
     u_int8_t keys[16];
     u_int8_t shouldDraw;
+    u_int8_t shouldExit;
+    u_int8_t rpl_flag[8];
 } Cpu;
 
 typedef struct
@@ -39,4 +42,6 @@ void freeDecodedOpcode(DecodedOpcode* decodedOpcode);
 void execute(Cpu* cpu, DecodedOpcode* decodedOpcode, u_int16_t opcode);
 void decrementTimers(Cpu* cpu);
 void closeCpu(Cpu* cpu);
+u_int8_t readRplFlags(u_int8_t* rpl_flag);
+u_int8_t writeRplFlags(u_int8_t* rpl_flag);
 

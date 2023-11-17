@@ -2,6 +2,8 @@
 #include <string.h>
 #include "cpu.h"
 #include "instructions.h"
+#include <stdio.h>
+#include <sys/file.h>
 
 
 Cpu* initCpu()
@@ -37,7 +39,13 @@ Cpu* initCpu()
     memset(cpu->SCREEN, 0, sizeof(cpu->SCREEN));
     memccpy(cpu->M, FONT, 0, sizeof(FONT));
     cpu->shouldDraw = 0;
+    cpu->shouldExit = 0;
     memset(cpu->keys, 0, sizeof(cpu->keys));
+    memset(cpu->rpl_flag, 0, sizeof(cpu->rpl_flag));
+    if (readRplFlags(cpu->rpl_flag) == 1)
+    {
+        writeRplFlags(cpu->rpl_flag);
+    }
     return cpu;
 }
 
@@ -47,6 +55,32 @@ u_int16_t fetch(Cpu* cpu)
     u_int16_t opcode = cpu->M[cpu->PC] << 8 | cpu->M[cpu->PC + 1];
     cpu->PC +=  2;
     return opcode;
+}
+
+u_int8_t readRplFlags(u_int8_t* rpl_flag)
+{
+    FILE* file = fopen("rpl.8", "rb");
+    if (file == NULL)
+    {
+        perror("Error opening file for writing");
+        return -1;
+    }
+    fread(rpl_flag, sizeof(u_int8_t), 8, file);
+    fclose(file);
+    return 0;
+}
+
+u_int8_t writeRplFlags(u_int8_t* rpl_flag)
+{
+    FILE* file = fopen("rpl.8", "wb");
+    if (file == NULL)
+    {
+        perror("Error opening file for writing");
+        return -1;
+    }
+    fwrite(rpl_flag, sizeof(u_int8_t), 8, file);
+    fclose(file);
+    return 0;
 }
 
 DecodedOpcode* decode(Cpu* cpu, u_int16_t opcode)

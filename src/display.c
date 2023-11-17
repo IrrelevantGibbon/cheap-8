@@ -13,20 +13,19 @@ Display* initDisplay()
                                        SDL_WINDOWPOS_CENTERED,
                                        SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-
-    SDL_Texture *screen = SDL_CreateTexture(renderer,
-                                            SDL_PIXELFORMAT_ARGB8888,
-                                            SDL_TEXTUREACCESS_TARGET,
-                                            64, 32);
-
-    SDL_SetRenderTarget(renderer, screen);
-
     Display *display = (Display *)malloc(sizeof(Display));
     display->window = win;
-    display->renderer = renderer;
-    display->screen = screen;
+    display->renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
+    display->screen = createTexture(display->renderer, 64, 32);
+
+    SDL_SetRenderTarget(display->renderer, display->screen);
+
     return display;
+}
+
+SDL_Texture* createTexture(SDL_Renderer* renderer, u_int8_t width, u_int32_t height)
+{
+    return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,SDL_TEXTUREACCESS_TARGET, width, height);
 }
 
 void draw(Display* display, Cpu* cpu)

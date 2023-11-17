@@ -16,3 +16,4 @@ typedef struct
 Display* initDisplay();
 void draw(Display* display, Cpu* cpu);
 void closeDisplay(Display* display);
+SDL_Texture* createTexture(SDL_Renderer* renderer, u_int8_t width, u_int32_t height);

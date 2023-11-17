@@ -35,3 +35,15 @@ void LD_F(Cpu* cpu, u_int8_t x);
 void LD_B(Cpu* cpu, u_int8_t x);
 void LD_MEM(Cpu* cpu, u_int8_t x);
 void LD_REG_MEM(Cpu* cpu, u_int8_t x);
+
+// SuperChip
+
+void SCR_D(u_int8_t n);
+void SCR_DR();
+void SCR_DL();
+void EXIT(Cpu* cpu);
+void DESM();
+void EESM();
+void LD_FE(Cpu* cpu, u_int8_t x);
+void STR_RPL(Cpu* cpu, u_int8_t x);
+void LD_RPL(Cpu* cpu, u_int8_t x);

@@ -9,17 +9,17 @@ int init_cheap_8(const char* filepath)
 
     loop(cpu, display);
 
+    writeRplFlags(cpu->rpl_flag);
     closeDisplay(display);
     closeCpu(cpu);
 }
-
 
 
 void loop(Cpu* cpu, Display* display)
 {
     while(1)
     {
-        if (event_management(cpu) == 1) break;
+        if (cpu->shouldExit == 1 || event_management(cpu) == 1) break;
         emulate_cycle(cpu);
         if (cpu->shouldDraw == 1) draw_screen(cpu, display);
         SDL_Delay(1000/500);
