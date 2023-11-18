@@ -47,6 +47,8 @@ Cpu* initCpu()
         writeRplFlags(cpu->rpl_flag);
     }
     cpu->shouldExtend = 1;
+    cpu->shift_x = 0;
+    cpu->shift_y = 0;
     return cpu;
 }
 

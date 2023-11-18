@@ -309,3 +309,18 @@ void EESM(Cpu* cpu)
 {
     cpu->shouldExtend = 2;
 }
+
+void SCR_D(Cpu* cpu, u_int8_t n)
+{
+    cpu->shift_y += n;
+}
+
+void SCR_DR(Cpu* cpu)
+{
+    cpu->shift_x += 4;
+}
+
+void SCR_DL(Cpu* cpu)
+{
+    cpu->shift_x -= 4;
+}

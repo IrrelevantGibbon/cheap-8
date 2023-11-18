@@ -45,21 +45,21 @@ void setTexturesDimension(Display* display, u_int32_t width, u_int32_t height)
 
 void draw(Display* display, Cpu* cpu)
 {
-    for (int x = 0; x < 64; x++)
+    SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
+    SDL_Rect rect = { 0, 0, display->width, display->height };
+    SDL_RenderFillRect(display->renderer, &rect);
+
+    for (int x = 0; x < display->width; x++)
     {
-        for (int y = 0; y < 32; y++)
+        for (int y = 0; y < display->height; y++)
         {
-            int i = y * 64 + x;
+            int i = y * display->width + x;
             if (cpu->SCREEN[i] == 1)
             {
                 SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+                SDL_Rect rect = { x, y, 1, 1 };
+                SDL_RenderFillRect(display->renderer, &rect);
             }
-            else
-            {
-                SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
-            }
-            SDL_Rect rect = { x, y, 1, 1 };
-            SDL_RenderFillRect(display->renderer, &rect);
         }
     }
 }

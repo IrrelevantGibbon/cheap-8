@@ -38,9 +38,9 @@ void LD_REG_MEM(Cpu* cpu, u_int8_t x);
 
 // SuperChip
 
-void SCR_D(u_int8_t n);
-void SCR_DR();
-void SCR_DL();
+void SCR_D(Cpu* cpu, u_int8_t n);
+void SCR_DR(Cpu* cpu);
+void SCR_DL(Cpu* cpu);
 void EXIT(Cpu* cpu);
 void DESM(Cpu* cpu);
 void EESM(Cpu* cpu);
