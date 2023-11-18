@@ -163,11 +163,10 @@ void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
     u_int8_t vy = cpu->V[y];
     u_int8_t heigh = n;
 
-
     for (u_int8_t i = 0; i < heigh; i++)
     {
         u_int8_t pxl = cpu->M[cpu->I + i];
-        for (u_int8_t j = 0; j < 8; j++)
+        for (u_int8_t j = 0; j < (cpu->extended ? 16 : 8); j++)
         {
             if ((pxl & (0x80 >> j)) != 0)
             {
@@ -303,11 +302,13 @@ void LD_RPL(Cpu* cpu, u_int8_t x)
 void DESM(Cpu* cpu)
 {
     cpu->shouldExtend = 1;
+    cpu->extended = 0;
 }
 
 void EESM(Cpu* cpu)
 {
     cpu->shouldExtend = 2;
+    cpu->extended = 1;
 }
 
 void SCR_D(Cpu* cpu, u_int8_t n)

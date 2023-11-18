@@ -49,9 +49,9 @@ void draw(Display* display, Cpu* cpu)
     SDL_Rect rect = { 0, 0, display->width, display->height };
     SDL_RenderFillRect(display->renderer, &rect);
 
-    for (int x = 0; x < display->width; x++)
+    for (int x = (cpu->shift_x < 0 ? cpu->shift_x * -1 : 0) ; x < display->width - (cpu->shift_x > 0 ? cpu->shift_x: 0); x++)
     {
-        for (int y = 0; y < display->height; y++)
+        for (int y = cpu->shift_y; y < display->height; y++)
         {
             int i = y * display->width + x;
             if (cpu->SCREEN[i] == 1)

@@ -19,11 +19,12 @@ typedef struct
     u_int16_t PC; // Program counter
     u_int8_t SP; // Stack pointer
     u_int16_t S[16]; // Stack
-    uint8_t SCREEN[2048]; // Screen
+    uint8_t SCREEN[8192]; // Screen
     u_int8_t keys[16];
     u_int8_t shouldDraw;
     u_int8_t shouldExit;
     u_int8_t shouldExtend;
+    u_int8_t extended;
     u_int8_t rpl_flag[8];
     u_int8_t shift_x;
     u_int8_t shift_y;
