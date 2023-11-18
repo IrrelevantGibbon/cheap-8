@@ -19,6 +19,7 @@ Display* initDisplay()
     display->width = 64;
     display->height = 32;
     display->shouldReRender = 0;
+    display->screen = NULL;
     createOrSwapTexture(display);
 
     return display;
