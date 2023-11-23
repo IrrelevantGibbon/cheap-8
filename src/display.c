@@ -16,8 +16,8 @@ Display* initDisplay()
     Display *display = (Display *)malloc(sizeof(Display));
     display->window = win;
     display->renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-    display->width = 64;
-    display->height = 32;
+    display->width = 128;
+    display->height = 64;
     display->shouldReRender = 0;
     display->screen = NULL;
     createOrSwapTexture(display);

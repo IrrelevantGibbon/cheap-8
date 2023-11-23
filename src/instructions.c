@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <string.h>
 void CLS(Cpu* cpu)
 {
-    for (int i = 0; i < 64 * 32; i++)
+    for (int i = 0; i < 128 * 64; i++)
     {
         cpu->SCREEN[i] = 0;
         cpu->shouldDraw = 1;
@@ -162,15 +163,24 @@ void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
     u_int8_t vx = cpu->V[x];
     u_int8_t vy = cpu->V[y];
     u_int8_t heigh = n;
+    u_int8_t width = 8;
+
+    // printf("%d %d %d %d\n",x, y, n, cpu->extended);
+
+    if (n == 0 && cpu->extended == 1) {
+        heigh = 16;
+        width = 16;
+       // printf("bite");
+    }
 
     for (u_int8_t i = 0; i < heigh; i++)
     {
         u_int8_t pxl = cpu->M[cpu->I + i];
-        for (u_int8_t j = 0; j < (cpu->extended ? 16 : 8); j++)
+        for (u_int8_t j = 0; j < width; j++)
         {
             if ((pxl & (0x80 >> j)) != 0)
             {
-                u_int8_t* screenPxl = &cpu->SCREEN[(vy + i) * 64 + vx + j];
+                u_int8_t* screenPxl = &cpu->SCREEN[(vy + i) * 128 + vx + j];
                 if ((*screenPxl) == 1)
                 {
                     cpu->V[0xF] = 1;
@@ -274,7 +284,7 @@ void EXIT(Cpu* cpu)
 
 void LD_FE(Cpu* cpu, u_int8_t x)
 {
-    cpu->I = cpu->V[x] * 0xA;
+    cpu->I = 80 + cpu->V[x] * 0xA;
 }
 
 void STR_RPL(Cpu* cpu, u_int8_t x)
@@ -313,7 +323,16 @@ void EESM(Cpu* cpu)
 
 void SCR_D(Cpu* cpu, u_int8_t n)
 {
-    cpu->shift_y += n;
+    u_int32_t max_size = 128 * 64;
+    for (u_int32_t i = 0; i < max_size; i++)
+    {
+        if (i + 128 < max_size)
+        {
+            cpu->BUFFER[i + 128] = cpu->SCREEN[i];
+        }
+    }
+    memcpy(cpu->SCREEN, cpu->BUFFER, sizeof(cpu->BUFFER));
+    memset(cpu->BUFFER, 0, sizeof(cpu->BUFFER));
 }
 
 void SCR_DR(Cpu* cpu)
