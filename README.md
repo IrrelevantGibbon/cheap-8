@@ -1,5 +1,5 @@
 # cheap-8
-Simple chip-8 interpreter 
+Simple chip-8 and schip interpreter 
 
 ### State
 ----------
