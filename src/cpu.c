@@ -63,6 +63,7 @@ Cpu* initCpu()
         writeRplFlags(cpu->rpl_flag);
     }
     cpu->extended = 1;
+    cpu->pause = 0;
     return cpu;
 }
 

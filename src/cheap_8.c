@@ -33,9 +33,10 @@ void loop(Cpu* cpu, Display* display)
     while(1)
     {
         if (cpu->shouldExit == 1 || event_management(cpu) == 1) break;
-
-        for (u_int8_t x = 0; x < EMULATE_CYCLE; x++)  emulate_cycle(cpu, display);
-        if (display->shouldReRender == 1) createOrSwapTexture(display);
+        if (cpu->pause == 0) {
+            for (u_int8_t x = 0; x < EMULATE_CYCLE; x++)  emulate_cycle(cpu, display);
+            if (display->shouldReRender == 1) createOrSwapTexture(display);
+        }
         draw_screen(cpu, display);
         SDL_Delay(1000/60);
     }
@@ -98,6 +99,7 @@ void get_keydown_events(Cpu* cpu, const SDL_Event event)
     if (event.key.keysym.sym == SDLK_DOWN) cpu->keys[0xD] = 1;
     if (event.key.keysym.sym == SDLK_f) cpu->keys[0xE] = 1;
     if (event.key.keysym.sym == SDLK_v) cpu->keys[0xF] = 1;
+    if (event.key.keysym.sym == SDLK_SPACE) cpu->pause = !cpu->pause;
 }
 
 void get_keyup_events(Cpu* cpu, const SDL_Event event)
