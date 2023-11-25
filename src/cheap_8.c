@@ -1,45 +1,56 @@
 #include "cheap_8.h"
+#include <string.h>
 
-int init_cheap_8(const char* filepath)
+int init_cheap_8(const int type, const char* filepath)
 {
-    Display *display = initDisplay();
+    u_int8_t width, height = 0;
+
+    if (type == CHIP_8) {
+        width = CHEAP_8_SCREEN_WIDTH;
+        height = CHEAP_8_SCREEN_HEIGHT;
+    }
+
+    if (type == SCHIP) {
+        width = SCHIP_SCREEN_WIDTH;
+        height = SCHIP_SCREEN_HEIGHT;
+    }
+
+    Display *display = initDisplay(width, height);
     Cpu *cpu = initCpu();
 
     loadRom(filepath, cpu->M);
 
     loop(cpu, display);
 
+    writeRplFlags(cpu->rpl_flag);
     closeDisplay(display);
     closeCpu(cpu);
 }
-
 
 
 void loop(Cpu* cpu, Display* display)
 {
     while(1)
     {
-        if (event_management(cpu) == 1) break;
-        emulate_cycle(cpu);
-        if (cpu->shouldDraw == 1) draw_screen(cpu, display);
-        SDL_Delay(1000/500);
+        if (cpu->shouldExit == 1 || event_management(cpu) == 1) break;
+
+        for (u_int8_t x = 0; x < EMULATE_CYCLE; x++)  emulate_cycle(cpu, display);
+        if (display->shouldReRender == 1) createOrSwapTexture(display);
+        draw_screen(cpu, display);
+        SDL_Delay(1000/60);
     }
 }
 
 
-void emulate_cycle(Cpu* cpu)
+void emulate_cycle(Cpu* cpu, Display* display)
 {
-    u_int16_t opcode = fetch(cpu);
-    DecodedOpcode* decodedOpcode = decode(cpu, opcode);
-    execute(cpu, decodedOpcode, opcode);
-    freeDecodedOpcode(decodedOpcode);
+    execute(cpu, display, decode(fetch(cpu)));
 }
 
 void draw_screen(Cpu* cpu, Display* display)
 {
-    cpu->shouldDraw = 0;
     SDL_SetRenderTarget(display->renderer, display->screen);
-    draw(display, cpu);
+    draw(display, cpu->SCREEN);
     SDL_SetRenderTarget(display->renderer, NULL);
     SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
     SDL_RenderClear(display->renderer);
@@ -69,7 +80,7 @@ int event_management(Cpu* cpu)
     return 0;
 }
 
-void get_keydown_events(Cpu* cpu, SDL_Event event)
+void get_keydown_events(Cpu* cpu, const SDL_Event event)
 {
     if (event.key.keysym.sym == SDLK_x) cpu->keys[0x0] = 1;
     if (event.key.keysym.sym == SDLK_a) cpu->keys[0x1] = 1;
@@ -89,7 +100,7 @@ void get_keydown_events(Cpu* cpu, SDL_Event event)
     if (event.key.keysym.sym == SDLK_v) cpu->keys[0xF] = 1;
 }
 
-void get_keyup_events(Cpu* cpu, SDL_Event event)
+void get_keyup_events(Cpu* cpu, const SDL_Event event)
 {
     if (event.key.keysym.sym == SDLK_x) cpu->keys[0x0] = 0;
     if (event.key.keysym.sym == SDLK_a) cpu->keys[0x1] = 0;
