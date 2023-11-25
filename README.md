@@ -15,11 +15,3 @@ Implementation almost done but not fully functional (somme errors on some games 
 [x] Display
 
 [x] Keyboard
-
-#### TODO
-
-[] Debug current errors
-
-[] Rework keyboard
-
-[] Add a clean debugger
