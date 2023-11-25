@@ -1,14 +1,16 @@
 #include "cpu.h"
+#include "cheap_8.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
+
+
 void CLS(Cpu* cpu)
 {
     for (int i = 0; i < 128 * 64; i++)
     {
         cpu->SCREEN[i] = 0;
-        cpu->shouldDraw = 1;
     }
 }
 
@@ -157,7 +159,7 @@ void RND(Cpu* cpu, u_int8_t x, u_int8_t nn)
     cpu->V[x] = (u_int16_t)((rand() % 256) & nn);
 }
 
-void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
+void DRW(Cpu* cpu, u_int8_t w,  u_int8_t x, u_int8_t y, u_int8_t n)
 {
     cpu->V[0xF] = 0;
     u_int8_t vx = cpu->V[x];
@@ -165,12 +167,9 @@ void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
     u_int8_t heigh = n;
     u_int8_t width = 8;
 
-    // printf("%d %d %d %d\n",x, y, n, cpu->extended);
-
     if (n == 0 && cpu->extended == 1) {
         heigh = 16;
         width = 16;
-       // printf("bite");
     }
 
     for (u_int8_t i = 0; i < heigh; i++)
@@ -180,7 +179,7 @@ void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
         {
             if ((pxl & (0x80 >> j)) != 0)
             {
-                u_int8_t* screenPxl = &cpu->SCREEN[(vy + i) * 128 + vx + j];
+                u_int8_t* screenPxl = &cpu->SCREEN[(vy + i) * w + vx + j];
                 if ((*screenPxl) == 1)
                 {
                     cpu->V[0xF] = 1;
@@ -189,7 +188,6 @@ void DRW(Cpu* cpu, u_int8_t x, u_int8_t y, u_int8_t n)
             }
         }
     }
-    cpu->shouldDraw = 1;
 }
 
 void SKP(Cpu* cpu, u_int8_t x)
@@ -309,26 +307,26 @@ void LD_RPL(Cpu* cpu, u_int8_t x)
     }
 }
 
-void DESM(Cpu* cpu)
+void DESM(Cpu* cpu, Display* display)
 {
-    cpu->shouldExtend = 1;
     cpu->extended = 0;
+    setTexturesDimension(display, CHEAP_8_SCREEN_WIDTH, CHEAP_8_SCREEN_HEIGHT);
 }
 
-void EESM(Cpu* cpu)
+void EESM(Cpu* cpu, Display* display)
 {
-    cpu->shouldExtend = 2;
     cpu->extended = 1;
+    setTexturesDimension(display, SCHIP_SCREEN_WIDTH, SCHIP_SCREEN_HEIGHT);
 }
 
 void SCR_D(Cpu* cpu, u_int8_t n)
 {
-    u_int32_t max_size = 128 * 64;
+    u_int32_t max_size = SCHIP_SCREEN_WIDTH * SCHIP_SCREEN_HEIGHT;
     for (u_int32_t i = 0; i < max_size; i++)
     {
-        if (i + 128 < max_size)
+        if (i + SCHIP_SCREEN_WIDTH < max_size)
         {
-            cpu->BUFFER[i + 128] = cpu->SCREEN[i];
+            cpu->BUFFER[i + SCHIP_SCREEN_WIDTH] = cpu->SCREEN[i];
         }
     }
     memcpy(cpu->SCREEN, cpu->BUFFER, sizeof(cpu->BUFFER));
@@ -337,10 +335,24 @@ void SCR_D(Cpu* cpu, u_int8_t n)
 
 void SCR_DR(Cpu* cpu)
 {
-    cpu->shift_x += 4;
+    for (u_int32_t i = 0; i < SCHIP_SCREEN_HEIGHT; i++)
+    {
+        for (u_int32_t j = 0; j < SCHIP_SCREEN_WIDTH - 4; j++) {
+            cpu->BUFFER[i * SCHIP_SCREEN_HEIGHT + j] = cpu->SCREEN[i];
+        }
+    }
+    memcpy(cpu->SCREEN, cpu->BUFFER, sizeof(cpu->BUFFER));
+    memset(cpu->BUFFER, 0, sizeof(cpu->BUFFER));
 }
 
 void SCR_DL(Cpu* cpu)
 {
-    cpu->shift_x -= 4;
+    for (u_int32_t i = 0; i < SCHIP_SCREEN_HEIGHT; i++)
+    {
+        for (u_int32_t j = 4; j < SCHIP_SCREEN_WIDTH; j++) {
+            cpu->BUFFER[i * SCHIP_SCREEN_HEIGHT + j] = cpu->SCREEN[i];
+        }
+    }
+    memcpy(cpu->SCREEN, cpu->BUFFER, sizeof(cpu->BUFFER));
+    memset(cpu->BUFFER, 0, sizeof(cpu->BUFFER));
 }

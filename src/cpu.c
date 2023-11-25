@@ -55,7 +55,6 @@ Cpu* initCpu()
     memset(cpu->SCREEN, 0, sizeof(cpu->SCREEN));
     memset(cpu->BUFFER, 0, sizeof(cpu->BUFFER));
     memccpy(cpu->M, FONT, 0, sizeof(FONT));
-    cpu->shouldDraw = 0;
     cpu->shouldExit = 0;
     memset(cpu->keys, 0, sizeof(cpu->keys));
     memset(cpu->rpl_flag, 0, sizeof(cpu->rpl_flag));
@@ -63,10 +62,7 @@ Cpu* initCpu()
     {
         writeRplFlags(cpu->rpl_flag);
     }
-    cpu->shouldExtend = 0;
     cpu->extended = 1;
-    cpu->shift_x = 0;
-    cpu->shift_y = 0;
     return cpu;
 }
 
@@ -104,31 +100,21 @@ u_int8_t writeRplFlags(u_int8_t* rpl_flag)
     return 0;
 }
 
-DecodedOpcode* decode(Cpu* cpu, u_int16_t opcode)
+DecodedOpcode decode(u_int16_t opcode)
 {
-    DecodedOpcode *decodedOpcode = (DecodedOpcode *)malloc(sizeof(DecodedOpcode));
-    decodedOpcode->x = dec_x(opcode);
-    decodedOpcode->y = dec_y(opcode);
-    decodedOpcode->n = dec_n(opcode);
-    decodedOpcode->nn = dec_nn(opcode);
-    decodedOpcode->nnn = dec_nnn(opcode);
-    return decodedOpcode;
+    return (DecodedOpcode){ opcode, dec_x(opcode), dec_y(opcode), dec_n(opcode), dec_nn(opcode), dec_nnn(opcode)};
 }
 
-void freeDecodedOpcode(DecodedOpcode* decodedOpcode)
+void execute(Cpu* cpu, Display* display, DecodedOpcode decodedOpcode)
 {
-    free(decodedOpcode);
-}
+    printf("Executing opcode: 0x%X\n", decodedOpcode.opcode);
 
+    u_int16_t op = decodedOpcode.opcode;
 
-void execute(Cpu* cpu, DecodedOpcode* decodedOpcode, u_int16_t opcode)
-{
-    printf("Executing opcode: 0x%X\n", opcode);
-
-    switch (opcode & 0xF000)
+    switch (op & 0xF000)
     {
         case 0x0000:
-            switch (opcode & 0x000F)
+            switch (op & 0x000F)
             {
                 case 0x0000:
                     CLS(cpu);
@@ -147,185 +133,185 @@ void execute(Cpu* cpu, DecodedOpcode* decodedOpcode, u_int16_t opcode)
                     printf("SCR_DR() called\n");
                     break;
                 case 0x00FE:
-                    DESM(cpu);
+                    DESM(cpu, display);
                     printf("DESM() called\n");
                     break;
                 case 0x00FF:
-                    EESM(cpu);
+                    EESM(cpu, display);
                     printf("EESM() called\n");
                     break;
                 default:
-                    SCR_D(cpu, decodedOpcode->n);
-                    printf("Unknown opcode in 0x0000 switch: 0x%X\n", opcode);
+                    SCR_D(cpu, decodedOpcode.n);
+                    printf("Unknown opcode in 0x0000 switch: 0x%X\n", op);
                     break;
             }
             break;
         case 0X1000:
-            JP(cpu, decodedOpcode->nnn);
-            printf("JP(%u) called\n", decodedOpcode->nnn);
+            JP(cpu, decodedOpcode.nnn);
+            printf("JP(%u) called\n", decodedOpcode.nnn);
             break;
         case 0X2000:
-            CALL(cpu, decodedOpcode->nnn);
-            printf("CALL(%u) called\n", decodedOpcode->nnn);
+            CALL(cpu, decodedOpcode.nnn);
+            printf("CALL(%u) called\n", decodedOpcode.nnn);
             break;
         case 0X3000:
-            SE(cpu, decodedOpcode->x, decodedOpcode->nn);
-            printf("SE(%u, %u) called\n", decodedOpcode->x, decodedOpcode->nn);
+            SE(cpu, decodedOpcode.x, decodedOpcode.nn);
+            printf("SE(%u, %u) called\n", decodedOpcode.x, decodedOpcode.nn);
             break;
         case 0X4000:
-            SNE(cpu, decodedOpcode->x, decodedOpcode->nn);
-            printf("SNE(%u, %u) called\n", decodedOpcode->x, decodedOpcode->nn);
+            SNE(cpu, decodedOpcode.x, decodedOpcode.nn);
+            printf("SNE(%u, %u) called\n", decodedOpcode.x, decodedOpcode.nn);
             break;
         case 0X5000:
-            SE_REG(cpu, decodedOpcode->x, decodedOpcode->y);
-            printf("SE_REG(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+            SE_REG(cpu, decodedOpcode.x, decodedOpcode.y);
+            printf("SE_REG(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
             break;
         case 0X6000:
-            LD(cpu, decodedOpcode->x, decodedOpcode->nn);
-            printf("LD(%u, %u) called\n", decodedOpcode->x, decodedOpcode->nn);
+            LD(cpu, decodedOpcode.x, decodedOpcode.nn);
+            printf("LD(%u, %u) called\n", decodedOpcode.x, decodedOpcode.nn);
             break;
         case 0x7000:
-            ADD(cpu, decodedOpcode->x, decodedOpcode->nn);
-            printf("ADD(%u, %u) called\n", decodedOpcode->x, decodedOpcode->nn);
+            ADD(cpu, decodedOpcode.x, decodedOpcode.nn);
+            printf("ADD(%u, %u) called\n", decodedOpcode.x, decodedOpcode.nn);
             break;
         case 0x8000:
-            switch (opcode & 0x000F)
+            switch (op & 0x000F)
             {
                 case 0x0000:
-                    LD_REG(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("LD_REG(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    LD_REG(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("LD_REG(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0001:
-                    OR(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("OR(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    OR(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("OR(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0002:
-                    AND(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("AND(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    AND(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("AND(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0003:
-                    XOR(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("XOR(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    XOR(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("XOR(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0004:
-                    ADD_REG(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("ADD_REG(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    ADD_REG(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("ADD_REG(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0005:
-                    SUB(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("SUB(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    SUB(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("SUB(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x0006:
-                    SHR(cpu, decodedOpcode->x);
-                    printf("SHR(%u) called\n", decodedOpcode->x);
+                    SHR(cpu, decodedOpcode.x);
+                    printf("SHR(%u) called\n", decodedOpcode.x);
                     break;
                 case 0x0007:
-                    SUBN(cpu, decodedOpcode->x, decodedOpcode->y);
-                    printf("SUBN(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+                    SUBN(cpu, decodedOpcode.x, decodedOpcode.y);
+                    printf("SUBN(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
                     break;
                 case 0x000E:
-                    SHL(cpu, decodedOpcode->x);
-                    printf("SHL(%u) called\n", decodedOpcode->x);
+                    SHL(cpu, decodedOpcode.x);
+                    printf("SHL(%u) called\n", decodedOpcode.x);
                     break;
                 default:
-                    printf("Unknown opcode in 0x8000 switch: 0x%X\n", opcode);
+                    printf("Unknown opcode in 0x8000 switch: 0x%X\n", op);
                     break;
             }
             break;
         case 0x9000:
-            SNE_REG(cpu, decodedOpcode->x, decodedOpcode->y);
-            printf("SNE_REG(%u, %u) called\n", decodedOpcode->x, decodedOpcode->y);
+            SNE_REG(cpu, decodedOpcode.x, decodedOpcode.y);
+            printf("SNE_REG(%u, %u) called\n", decodedOpcode.x, decodedOpcode.y);
             break;
         case 0xA000:
-            LD_I(cpu, decodedOpcode->nnn);
-            printf("LD_I(%u) called\n", decodedOpcode->nnn);
+            LD_I(cpu, decodedOpcode.nnn);
+            printf("LD_I(%u) called\n", decodedOpcode.nnn);
             break;
         case 0xB000:
-            JP_V0(cpu, decodedOpcode->nnn);
-            printf("JP_V0(%u) called\n", decodedOpcode->nnn);
+            JP_V0(cpu, decodedOpcode.nnn);
+            printf("JP_V0(%u) called\n", decodedOpcode.nnn);
             break;
         case 0xC000:
-            RND(cpu, decodedOpcode->x, decodedOpcode->nn);
-            printf("RND(%u, %u) called\n", decodedOpcode->x, decodedOpcode->nn);
+            RND(cpu, decodedOpcode.x, decodedOpcode.nn);
+            printf("RND(%u, %u) called\n", decodedOpcode.x, decodedOpcode.nn);
             break;
         case 0xD000:
-            DRW(cpu, decodedOpcode->x, decodedOpcode->y, decodedOpcode->n);
-            printf("DRW(%u, %u, %u) called\n", decodedOpcode->x, decodedOpcode->y, decodedOpcode->n);
+            DRW(cpu, display->width, decodedOpcode.x, decodedOpcode.y, decodedOpcode.n);
+            printf("DRW(%u, %u, %u) called\n", decodedOpcode.x, decodedOpcode.y, decodedOpcode.n);
             break;
         case 0xE000:
-            switch (opcode & 0x00FF)
+            switch (op & 0x00FF)
             {
                 case 0x009E:
-                    SKP(cpu, decodedOpcode->x);
-                    printf("SKP(%u) called\n", decodedOpcode->x);
+                    SKP(cpu, decodedOpcode.x);
+                    printf("SKP(%u) called\n", decodedOpcode.x);
                     break;
                 case 0x00A1:
-                    SKNP(cpu, decodedOpcode->x);
-                    printf("SKNP(%u) called\n", decodedOpcode->x);
+                    SKNP(cpu, decodedOpcode.x);
+                    printf("SKNP(%u) called\n", decodedOpcode.x);
                     break;
                 default:
-                    printf("Unknown opcode in 0xE000 switch: 0x%X\n", opcode);
+                    printf("Unknown opcode in 0xE000 switch: 0x%X\n", op);
                     break;
             }
             break;
-case 0xF000:
-            switch (opcode & 0x00FF)
+        case 0xF000:
+            switch (op & 0x00FF)
             {
                 case 0x0007:
-                    LD_REG_DT(cpu, decodedOpcode->x);
-                    printf("LD_REG_DT(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_REG_DT(cpu, decodedOpcode.x);
+                    printf("LD_REG_DT(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x000A:
-                    LD_KEY(cpu, decodedOpcode->x);
-                    printf("LD_KEY(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_KEY(cpu, decodedOpcode.x);
+                    printf("LD_KEY(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0015:
-                    LD_DT(cpu, decodedOpcode->x);
-                    printf("LD_DT(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_DT(cpu, decodedOpcode.x);
+                    printf("LD_DT(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0018:
-                    LD_ST(cpu, decodedOpcode->x);
-                    printf("LD_ST(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_ST(cpu, decodedOpcode.x);
+                    printf("LD_ST(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x001E:
-                    ADD_I(cpu, decodedOpcode->x);
-                    printf("ADD_I(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    ADD_I(cpu, decodedOpcode.x);
+                    printf("ADD_I(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0029:
-                    LD_F(cpu, decodedOpcode->x);
-                    printf("LD_F(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_F(cpu, decodedOpcode.x);
+                    printf("LD_F(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0030:
-                    LD_FE(cpu, decodedOpcode->x);
-                    printf("LD_FE(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_FE(cpu, decodedOpcode.x);
+                    printf("LD_FE(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0033:
-                    LD_B(cpu, decodedOpcode->x);
-                    printf("LD_B(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_B(cpu, decodedOpcode.x);
+                    printf("LD_B(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0055:
-                    LD_MEM(cpu, decodedOpcode->x);
-                    printf("LD_MEM(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_MEM(cpu, decodedOpcode.x);
+                    printf("LD_MEM(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0065:
-                    LD_REG_MEM(cpu, decodedOpcode->x);
-                    printf("LD_REG_MEM(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_REG_MEM(cpu, decodedOpcode.x);
+                    printf("LD_REG_MEM(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0075:
-                    STR_RPL(cpu, decodedOpcode->x);
-                    printf("STR_RPL(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    STR_RPL(cpu, decodedOpcode.x);
+                    printf("STR_RPL(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 case 0x0085:
-                    LD_RPL(cpu, decodedOpcode->x);
-                    printf("LD_RPL(%u) called, Opcode: 0x%X\n", decodedOpcode->x, opcode);
+                    LD_RPL(cpu, decodedOpcode.x);
+                    printf("LD_RPL(%u) called, Opcode: 0x%X\n", decodedOpcode.x, op);
                     break;
                 default:
-                    printf("Unknown opcode in 0xF000 switch: 0x%X\n", opcode);
+                    printf("Unknown opcode in 0xF000 switch: 0x%X\n", op);
                     break;
             }
             break;
         default:
-            printf("Unknown main switch opcode: 0x%X\n", opcode);
+            printf("Unknown main switch opcode: 0x%X\n", op);
             break;
     }
     decrementTimers(cpu);

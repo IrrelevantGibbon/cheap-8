@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include "display.h"
-#include "cpu.h"
 
-Display* initDisplay()
+Display* initDisplay(u_int8_t width, u_int8_t height)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         printf("error initializing SDL: %s\n", SDL_GetError());
@@ -16,8 +15,8 @@ Display* initDisplay()
     Display *display = (Display *)malloc(sizeof(Display));
     display->window = win;
     display->renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-    display->width = 128;
-    display->height = 64;
+    display->width = width;
+    display->height = height;
     display->shouldReRender = 0;
     display->screen = NULL;
     createOrSwapTexture(display);
@@ -44,18 +43,18 @@ void setTexturesDimension(Display* display, u_int32_t width, u_int32_t height)
 }
 
 
-void draw(Display* display, Cpu* cpu)
+void draw(Display* display, u_int8_t* screen)
 {
     SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
     SDL_Rect rect = { 0, 0, display->width, display->height };
     SDL_RenderFillRect(display->renderer, &rect);
 
-    for (int x = (cpu->shift_x < 0 ? cpu->shift_x * -1 : 0) ; x < display->width - (cpu->shift_x > 0 ? cpu->shift_x: 0); x++)
+    for (int x = 0 ; x < display->width; x++)
     {
-        for (int y = cpu->shift_y; y < display->height; y++)
+        for (int y = 0; y < display->height; y++)
         {
             int i = y * display->width + x;
-            if (cpu->SCREEN[i] == 1)
+            if (screen[i] == 1)
             {
                 SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
                 SDL_Rect rect = { x, y, 1, 1 };
