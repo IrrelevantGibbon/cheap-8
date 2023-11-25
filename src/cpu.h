@@ -27,6 +27,9 @@ typedef struct
     u_int8_t shouldExit;
     u_int8_t extended;
     u_int8_t rpl_flag[8];
+
+
+    u_int8_t pause;
 } Cpu;
 
 typedef struct
